@@ -18,26 +18,13 @@ class StateVectorSimulator(AbstractSimulator):
 
     def __init__(self) -> None:
         super().__init__()
-        self._results: list[SimulatorResult] = []
         self._state_vector: np.ndarray
-
-    @property
-    def results(self) -> list[SimulatorResult]:
-        """Return the results of the simulation
-
-        Returns:
-            list[SimulatorResult]: results of the simulation
-        """
-        return self._results
 
     def run(self, circuit: Circuit) -> None:
         """Run the circuit on the simulator
 
         Args:
             circuit (Circuit): circuit to run
-
-        Returns:
-            np.ndarray: state vector of the final state
         """
         # Initialize the state vector to |0>^n
         self._state_vector = np.zeros(2**circuit.num_qubits, dtype=complex)
@@ -70,10 +57,15 @@ class StateVectorSimulator(AbstractSimulator):
             #    :   │   │
             # q_n-1: ┤   ├─ n-1─────────────────  n-1
             #        └──┘
+
+            # state_vector_tensor_indices = [0, 1, 2, ..., n-1]
             state_vector_tensor_indices = list(range(circuit.num_qubits))
+            # gate_tensor_indices = [0, 1, 2, ..., m-1, qubits[0], qubits[1], ..., qubits[m-1]]
             gate_tensor_indices = list(
                 range(circuit.num_qubits, circuit.num_qubits + gate_num_qubits)
             ) + list(instruction.qubits)
+            # new_state_vector_tensor_indices = [0, 1, 2, ..., n-1]
+            # with qubits[i] replaced by gate_tensor_indices[i]
             new_state_vector_tensor_indices = copy(state_vector_tensor_indices)
             for i in range(gate_num_qubits):
                 new_state_vector_tensor_indices[instruction.qubits[i]] = (
