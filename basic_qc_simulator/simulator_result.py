@@ -1,0 +1,31 @@
+"""
+Module for the simulator result class.
+"""
+
+from dataclasses import dataclass
+from enum import StrEnum
+
+import numpy as np
+
+
+class SimulatorResultTypes(StrEnum):
+    """
+    Enum class for simulator result types
+    """
+
+    STATE_VECTOR = "state_vector"
+    COUNTS_DICT = "counts_dict"
+    EXPECTATION_VALUES = "expectation_values"
+    PROBABILITIES = "probabilities"
+    AMPLITUDES = "amplitudes"
+    DENSITY_MATRIX = "density_matrix"
+
+
+@dataclass
+class SimulatorResult:
+    """
+    Class for simulator results
+    """
+
+    result_type: SimulatorResultTypes
+    result: np.ndarray | dict

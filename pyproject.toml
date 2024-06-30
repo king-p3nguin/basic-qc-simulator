@@ -1,0 +1,73 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "basic-qc-simulator"
+description = "Basic implementation of quantum circuit simulator in Python for easy understanding."
+version = "0.1.0"
+requires-python = ">=3.11"
+license = {file = "LICENSE"}
+authors = [
+    {name = "king-p3nguin", email = "kazukitsuoka@g.ecc.u-tokyo.ac.jp"},
+]
+readme = "README.md"
+keywords = [
+    "quantum circuit",
+    "quantum computing",
+    "quantum",
+    "sdk",
+]
+classifiers = [
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: MacOS",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering",
+]
+dependencies = [
+    "numpy",
+]
+
+
+[project.optional-dependencies]
+qiskit = [
+    "qiskit >= 1.0.0",
+    "qiskit-aer",
+    "matplotlib",
+    "pylatexenc",
+]
+test = [
+    "tox",
+    "ipykernel",
+    "pytest",
+    "pytest-cov",
+    "black[jupyter]",
+    "isort",
+    "mypy",
+    "pylint",
+]
+
+[project.urls]
+Repository = "https://github.com/king-p3nguin/basic-qc-simulator"
+
+[tool.black]
+target-version = ["py311"]
+
+[tool.pylint]
+disable = "import-error,too-many-branches,import-outside-toplevel,protected-access,too-few-public-methods"
+
+[tool.isort]
+profile = "black"
+
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = true
+warn_unused_configs = true
+ignore_missing_imports = true
