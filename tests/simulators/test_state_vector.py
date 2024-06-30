@@ -2,6 +2,8 @@
 Test the state vector simulator.
 """
 
+import itertools
+
 import numpy as np
 import pytest
 from qiskit_aer import AerSimulator
@@ -13,17 +15,7 @@ from ..random import generate_random_circuit
 
 @pytest.mark.parametrize(
     "num_qubits, depth, seed",
-    [
-        (2, 1, 0),
-        (2, 1, 1),
-        (2, 1, 2),
-        (3, 2, 0),
-        (3, 2, 1),
-        (3, 2, 2),
-        (4, 3, 0),
-        (4, 3, 1),
-        (4, 3, 2),
-    ],
+    [(i, j, k) for i, j, k in itertools.product(range(2, 5), range(1, 4), range(3))],
 )
 def test_state_vector_simulator(num_qubits, depth, seed):
     """

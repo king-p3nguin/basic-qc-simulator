@@ -1,6 +1,7 @@
 # basic-qc-simulator
 
 [![Run tests](https://github.com/king-p3nguin/basic-qc-simulator/actions/workflows/test.yml/badge.svg)](https://github.com/king-p3nguin/basic-qc-simulator/actions/workflows/test.yml)
+[![codecov](https://codecov.io/gh/king-p3nguin/basic-qc-simulator/graph/badge.svg?token=CYIUd5adFd)](https://codecov.io/gh/king-p3nguin/basic-qc-simulator)
 
 Basic implementation of quantum circuit simulator in Python for easy understanding
 
