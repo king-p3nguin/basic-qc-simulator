@@ -38,7 +38,7 @@ dependencies = [
 
 [project.optional-dependencies]
 qiskit = [
-    "qiskit >= 1.0.0",
+    "qiskit",
     "qiskit-aer",
     "matplotlib",
     "pylatexenc",

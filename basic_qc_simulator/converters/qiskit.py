@@ -83,6 +83,8 @@ def _saving_results_in_qiskit(
 
     if result_type == SimulatorResultTypes.STATE_VECTOR:
         circuit.save_statevector()
+    elif result_type == SimulatorResultTypes.DENSITY_MATRIX:
+        circuit.save_density_matrix()
     else:
         raise ValueError(
             f"Qiskit converter does not support saving {result_type} result."

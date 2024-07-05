@@ -2,6 +2,7 @@
 Module for the state vector simulator.
 """
 
+import logging
 from copy import copy
 
 import numpy as np
@@ -9,6 +10,8 @@ import numpy as np
 from ..circuit import Circuit
 from ..simulator_result import SimulatorResult, SimulatorResultTypes
 from .abstract_simulator import AbstractSimulator
+
+logger = logging.getLogger(__name__)
 
 
 class StateVectorSimulator(AbstractSimulator):
@@ -60,7 +63,7 @@ class StateVectorSimulator(AbstractSimulator):
 
             # state_vector_tensor_indices = [0, 1, 2, ..., n-1]
             state_vector_tensor_indices = list(range(circuit.num_qubits))
-            # gate_tensor_indices = [0, 1, 2, ..., m-1, qubits[0], qubits[1], ..., qubits[m-1]]
+            # gate_tensor_indices = [n, n+1, n+2, ..., n+m-1, qubits[0], qubits[1], ..., qubits[m-1]]
             gate_tensor_indices = list(
                 range(circuit.num_qubits, circuit.num_qubits + gate_num_qubits)
             ) + list(instruction.qubits)
@@ -72,6 +75,12 @@ class StateVectorSimulator(AbstractSimulator):
                     gate_tensor_indices[i]
                 )
 
+            logger.debug(
+                msg=f"Applying gate '{instruction.gate.name}' to qubits {instruction.qubits}\n"
+                f"input indices: {state_vector_tensor_indices}\n"
+                f"gate indices: {gate_tensor_indices}\n"
+                f"output indices: {new_state_vector_tensor_indices}\n"
+            )
             # Apply the gate by contracting the state vector tensor with the gate tensor
             self._state_vector = np.einsum(
                 self._state_vector,
