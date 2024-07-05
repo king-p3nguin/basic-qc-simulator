@@ -5,7 +5,7 @@ Module for the base simulator class
 from abc import ABC, abstractmethod
 
 from ..circuit import Circuit
-from ..simulator_result import SimulatorResult, SimulatorResultTypes
+from ..simulator_result import SimulatorResult
 
 
 class AbstractSimulator(ABC):

@@ -63,7 +63,8 @@ class StateVectorSimulator(AbstractSimulator):
 
             # state_vector_tensor_indices = [0, 1, 2, ..., n-1]
             state_vector_tensor_indices = list(range(circuit.num_qubits))
-            # gate_tensor_indices = [n, n+1, n+2, ..., n+m-1, qubits[0], qubits[1], ..., qubits[m-1]]
+            # gate_tensor_indices
+            #   = [n, n+1, n+2, ..., n+m-1, qubits[0], qubits[1], ..., qubits[m-1]]
             gate_tensor_indices = list(
                 range(circuit.num_qubits, circuit.num_qubits + gate_num_qubits)
             ) + list(instruction.qubits)
@@ -76,7 +77,8 @@ class StateVectorSimulator(AbstractSimulator):
                 )
 
             logger.debug(
-                msg=f"Applying gate '{instruction.gate.name}' to qubits {instruction.qubits}\n"
+                msg=f"Applying gate '{instruction.gate.name}' "
+                f"to qubits {instruction.qubits}\n"
                 f"input indices: {state_vector_tensor_indices}\n"
                 f"gate indices: {gate_tensor_indices}\n"
                 f"output indices: {new_state_vector_tensor_indices}\n"
