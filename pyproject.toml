@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "basic-qc-simulator"
 description = "Basic implementation of quantum circuit simulator in Python for easy understanding."
-version = "0.1.0"
+dynamic = ["version"]
 requires-python = ">=3.11"
 license = {file = "LICENSE"}
 authors = [
@@ -38,7 +38,7 @@ dependencies = [
 
 [project.optional-dependencies]
 qiskit = [
-    "qiskit >= 1.0.0",
+    "qiskit",
     "qiskit-aer",
     "matplotlib",
     "pylatexenc",
@@ -52,16 +52,20 @@ test = [
     "isort",
     "mypy",
     "pylint",
+    "pre-commit",
 ]
 
 [project.urls]
 Repository = "https://github.com/king-p3nguin/basic-qc-simulator"
 
+[tool.setuptools.dynamic]
+version = {attr = "basic_qc_simulator.__version__"}
+
 [tool.black]
 target-version = ["py311"]
 
 [tool.pylint]
-disable = "import-error,too-many-branches,import-outside-toplevel,protected-access,too-few-public-methods"
+disable = "import-error,too-many-branches,import-outside-toplevel,protected-access,too-few-public-methods,fixme"
 
 [tool.isort]
 profile = "black"
@@ -71,3 +75,6 @@ python_version = "3.11"
 warn_return_any = true
 warn_unused_configs = true
 ignore_missing_imports = true
+
+[tool.codespell]
+ignore-words-list = "te,Ot"

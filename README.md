@@ -5,9 +5,10 @@
 
 Basic implementation of quantum circuit simulator in Python for easy understanding
 
-Currently, the following quantum circuit simulator is available:
+Currently, following quantum circuit simulators are available:
 
 - State vector simulator
+- Density matrix simulator
 
 ## Setup
 

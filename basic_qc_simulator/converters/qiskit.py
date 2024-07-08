@@ -6,7 +6,6 @@ from typing import TYPE_CHECKING
 
 from .. import gates
 from ..circuit import Circuit
-from ..simulator_result import SimulatorResultTypes
 from ..utils import check_module_installed
 
 if TYPE_CHECKING:
@@ -30,7 +29,8 @@ def to_qiskit(circuit: Circuit) -> "qiskit.QuantumCircuit":
     for idx, instruction in enumerate(circuit.instructions):
         if circuit._saving_results.get(idx) is not None:
             result_type = circuit._saving_results.get(idx)["result_type"]  # type: ignore
-            _saving_results_in_qiskit(qc, result_type)
+            qc.barrier(label=f"save_{result_type}")
+            # _saving_results_in_qiskit(qc, result_type)
         gate = instruction.gate
         if isinstance(gate, gates.XGate):
             qc.x(instruction.qubits[0])
@@ -63,27 +63,32 @@ def to_qiskit(circuit: Circuit) -> "qiskit.QuantumCircuit":
         result_type = circuit._saving_results.get(len(circuit.instructions))[
             "result_type"
         ]  # type: ignore
-        _saving_results_in_qiskit(qc, result_type)
+        qc.barrier(label=f"save_{result_type}")
+        # _saving_results_in_qiskit(qc, result_type)
 
     return qc
 
 
-def _saving_results_in_qiskit(
-    circuit: "qiskit.QuantumCircuit", result_type: SimulatorResultTypes
-) -> None:
-    """
-    Check if the circuit has a result to save and save it if needed
+# TODO: wait until this is resolved: https://github.com/Qiskit/qiskit-aer/issues/2190
+# def _saving_results_in_qiskit(
+#     circuit: "qiskit.QuantumCircuit", result_type: SimulatorResultTypes
+# ) -> None:
+#     """
+#     Check if the circuit has a result to save and save it if needed
 
-    Args:
-        circuit (qiskit.QuantumCircuit): qiskit circuit
-        result_type (SimulatorResultTypes): result type to save
-    """
-    # import qiskit_aer here to add additional methods to qiskit.QuantumCircuit
-    import qiskit_aer  # pylint: disable=unused-import
+#     Args:
+#         circuit (qiskit.QuantumCircuit): qiskit circuit
+#         result_type (SimulatorResultTypes): result type to save
+#     """
+#     # import qiskit_aer here to add additional methods to qiskit.QuantumCircuit
+#     import qiskit_aer  # pylint: disable=unused-import
 
-    if result_type == SimulatorResultTypes.STATE_VECTOR:
-        circuit.save_statevector()
-    else:
-        raise ValueError(
-            f"Qiskit converter does not support saving {result_type} result."
-        )
+#     if result_type == SimulatorResultTypes.STATE_VECTOR:
+#         circuit.save_statevector()
+#     elif result_type == SimulatorResultTypes.DENSITY_MATRIX:
+#         # circuit.save_density_matrix()
+#         pass
+#     else:
+#         raise ValueError(
+#             f"Qiskit converter does not support saving {result_type} result."
+#         )
