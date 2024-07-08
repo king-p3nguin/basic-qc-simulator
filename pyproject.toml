@@ -61,7 +61,7 @@ Repository = "https://github.com/king-p3nguin/basic-qc-simulator"
 target-version = ["py311"]
 
 [tool.pylint]
-disable = "import-error,too-many-branches,import-outside-toplevel,protected-access,too-few-public-methods"
+disable = "import-error,too-many-branches,import-outside-toplevel,protected-access,too-few-public-methods,fixme"
 
 [tool.isort]
 profile = "black"

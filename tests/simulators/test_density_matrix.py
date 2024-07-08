@@ -27,6 +27,7 @@ def test_density_matrix_simulator(num_qubits, depth, seed):
 
     # little endian -> big endian
     qiskit_circuit = circuit.to_qiskit().reverse_bits()
+    qiskit_circuit.save_density_matrix()
 
     simulator = DensityMatrixSimulator()
     simulator.run(circuit)

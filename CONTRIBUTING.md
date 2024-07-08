@@ -13,6 +13,8 @@ pip install -e .[qiskit,test]
 ```python
 import logging
 
-logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger("basic_qc_simulator")
+logger.setLevel(logging.DEBUG)
+if not logger.hasHandlers():
+    logger.addHandler(logging.StreamHandler())
 ```

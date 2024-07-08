@@ -58,32 +58,23 @@ class DensityMatrixSimulator(AbstractSimulator):
             instruction (Instruction): gate instruction
         """
         circuit_num_qubits = len(self._density_matrix.shape) // 2
-        gate_matrix = instruction.gate.matrix.reshape(
-            (2,) * instruction.gate.num_qubits * 2
-        )
-        gate_matrix_conj = np.conj(gate_matrix)
         gate_num_qubits = instruction.gate.num_qubits
+        gate_matrix = instruction.gate.matrix.reshape((2,) * gate_num_qubits * 2)
+        gate_matrix_conj = np.conj(instruction.gate.matrix).T.reshape(
+            (2,) * gate_num_qubits * 2
+        )
+
+        # density_matrix_tensor_indices = [0, 1, 2, ..., n-1, n, n+1, ..., 2n-1]
+        density_matrix_tensor_indices = list(range(circuit_num_qubits * 2))
 
         # gate_tensor_indices
         #   = [2n, 2n+1, 2n+2, ..., 2n+m-1, qubits[0], qubits[1], ..., qubits[m-1]]
         gate_tensor_indices = list(
             range(circuit_num_qubits * 2, circuit_num_qubits * 2 + gate_num_qubits)
         ) + list(instruction.qubits)
-        # gate_tensor_conj_indices
-        #   = [2n+m, 2n+m+1, 2n+m+2, ..., 2n+2m-1, n+qubits[0], n+qubits[1], ..., n+qubits[m-1]]
-        gate_tensor_conj_indices = list(
-            range(
-                circuit_num_qubits * 2 + gate_num_qubits,
-                circuit_num_qubits * 2 + gate_num_qubits * 2,
-            )
-        ) + [circuit_num_qubits + q for q in instruction.qubits]
-
-        # density_matrix_tensor_indices = [0, 1, 2, ..., n-1, n, n+1, ..., 2n-1]
-        density_matrix_tensor_indices = list(range(circuit_num_qubits * 2))
 
         # new_density_matrix_tensor_indices = [0, 1, 2, ..., n-1, n, n+1, ..., 2n-1]
-        # with qubits[i] replaced by gate_tensor_indices[i]
-        # and n+qubits[i] replaced by gate_tensor_conj_indices[i]
+        #   with qubits[i] replaced by gate_tensor_indices[i]
         new_density_matrix_tensor_indices = copy(density_matrix_tensor_indices)
         for i in range(gate_num_qubits):
             new_density_matrix_tensor_indices[instruction.qubits[i]] = (
@@ -105,13 +96,21 @@ class DensityMatrixSimulator(AbstractSimulator):
             new_density_matrix_tensor_indices,
         )
 
+        # gate_tensor_conj_indices
+        #   = [n+qubits[0], n+qubits[1], ..., n+qubits[m-1], 2n, 2n+1, 2n+2, ..., 2n+m-1]
+        gate_tensor_conj_indices = [
+            circuit_num_qubits + q for q in instruction.qubits
+        ] + list(
+            range(circuit_num_qubits * 2, circuit_num_qubits * 2 + gate_num_qubits)
+        )
+
         # new_density_matrix_tensor_indices = [0, 1, 2, ..., n-1, n, n+1, ..., 2n-1]
-        # with n+qubits[i] replaced by gate_tensor_conj_indices[i]
+        #   with n+qubits[i] replaced by gate_tensor_conj_indices[i]
         new_density_matrix_tensor_indices = copy(density_matrix_tensor_indices)
         for i in range(gate_num_qubits):
             new_density_matrix_tensor_indices[
                 circuit_num_qubits + instruction.qubits[i]
-            ] = gate_tensor_conj_indices[i]
+            ] = gate_tensor_conj_indices[gate_num_qubits + i]
 
         logger.debug(
             msg=f"Applying gate '{instruction.gate.name}' conjugate "

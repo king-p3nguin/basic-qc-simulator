@@ -27,6 +27,7 @@ def test_state_vector_simulator(num_qubits, depth, seed):
 
     # little endian -> big endian
     qiskit_circuit = circuit.to_qiskit().reverse_bits()
+    qiskit_circuit.save_statevector()
 
     simulator = StateVectorSimulator()
     simulator.run(circuit)
