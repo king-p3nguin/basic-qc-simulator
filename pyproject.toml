@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "basic-qc-simulator"
 description = "Basic implementation of quantum circuit simulator in Python for easy understanding."
-version = "0.2.0"
+dynamic = ["version"]
 requires-python = ">=3.11"
 license = {file = "LICENSE"}
 authors = [
@@ -56,6 +56,9 @@ test = [
 
 [project.urls]
 Repository = "https://github.com/king-p3nguin/basic-qc-simulator"
+
+[tool.setuptools.dynamic]
+version = {attr = "basic_qc_simulator.__version__"}
 
 [tool.black]
 target-version = ["py311"]
