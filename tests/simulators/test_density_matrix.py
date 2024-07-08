@@ -15,7 +15,7 @@ from ..random import generate_random_circuit
 
 @pytest.mark.parametrize(
     "num_qubits, depth, seed",
-    [(i, j, k) for i, j, k in itertools.product(range(2, 5), range(1, 4), range(3))],
+    list(itertools.product(range(2, 5), range(1, 4), range(3))),
 )
 def test_density_matrix_simulator(num_qubits, depth, seed):
     """
@@ -27,7 +27,7 @@ def test_density_matrix_simulator(num_qubits, depth, seed):
 
     # little endian -> big endian
     qiskit_circuit = circuit.to_qiskit().reverse_bits()
-    qiskit_circuit.save_density_matrix()
+    qiskit_circuit.save_density_matrix()  # pylint: disable=no-member
 
     simulator = DensityMatrixSimulator()
     simulator.run(circuit)
