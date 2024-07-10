@@ -15,6 +15,14 @@ class CustomNoiseModel:
         self.readout_error = None
         self.gate_errors: dict[GateTypes, KrausOperators] = {}
 
+    def __repr__(self) -> str:
+        return (
+            f"CustomNoiseModel(readout_error={self.readout_error},\n"
+            "gate_errors={})".format(
+                {key: value.name for key, value in self.gate_errors.items()}
+            )
+        )
+
     def add_noise_to_gate(self, gate_name: GateTypes, value: KrausOperators) -> None:
         """Set the kraus operators for a gate
 
@@ -22,7 +30,7 @@ class CustomNoiseModel:
             gate_name (GateTypes): gate type
             value (KrausOperators): kraus operators
         """
-        if not gate_name in GateTypes:
+        if not gate_name in GateTypes._value2member_map_:
             raise TypeError(f"gate_name {gate_name} must be of type GateTypes")
         if not isinstance(value, KrausOperators):
             raise TypeError(f"Value {value} must be of type KrausOperators")

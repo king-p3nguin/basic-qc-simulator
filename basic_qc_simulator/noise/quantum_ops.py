@@ -56,6 +56,7 @@ class KrausOperators(list):
         kraus_num_qubits = int(np.log2(self[0].shape[0]))
         reshaped_density_matrix = np.reshape(density_matrix, (2,) * num_qubits * 2)
         new_density_matrix = np.zeros_like(reshaped_density_matrix)
+        # Apply the kraus operators based on operator-sum representation
         for kraus_operator in self:
             kraus_gate = Gate(GateTypes.KRAUS, kraus_operator, kraus_num_qubits)
             instruction = Instruction(kraus_gate, qubits)

@@ -4,12 +4,16 @@ Module for the density matrix simulator.
 
 import logging
 from copy import copy
+from typing import TYPE_CHECKING
 
 import numpy as np
 
 from ..circuit import Instruction
 from ..simulator_result import SimulatorResult, SimulatorResultTypes
 from .abstract_simulator import AbstractSimulator
+
+if TYPE_CHECKING:
+    from ..noise.noise_channel import KrausOperators
 
 logger = logging.getLogger(__name__)
 
@@ -114,6 +118,24 @@ class DensityMatrixSimulator(AbstractSimulator):
             new_density_matrix_tensor_indices,
         )
         return state
+
+    def _apply_noise(
+        self, state: np.ndarray, noise: "KrausOperators", qubits: list[int]
+    ) -> np.ndarray:
+        """Apply noise to the density matrix
+
+        Args:
+            state (np.ndarray): density matrix to apply the noise to
+            noise (KrausOperators): noise to apply
+            qubits (list[int]): qubits to apply the noise to
+
+        Returns:
+            np.ndarray: resulting density matrix
+        """
+        num_qubits = len(state.shape) // 2
+        state = np.reshape(state, (2**num_qubits, 2**num_qubits))
+        state = noise.to_superoperator().apply(state, qubits)
+        return state.reshape((2,) * num_qubits * 2)
 
     def _save_result(self, save_resut_dict: dict, state: np.ndarray) -> None:
         """Save the result of the simulation
