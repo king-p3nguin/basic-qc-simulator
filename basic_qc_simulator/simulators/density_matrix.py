@@ -35,7 +35,8 @@ class DensityMatrixSimulator(AbstractSimulator):
         density_matrix = np.reshape(density_matrix, (2,) * num_qubits * 2)
         return density_matrix
 
-    def _apply_gate(self, instruction: Instruction, state: np.ndarray) -> np.ndarray:
+    @staticmethod
+    def _apply_gate(instruction: Instruction, state: np.ndarray) -> np.ndarray:
         """Apply a gate to the density matrix
 
         Args:

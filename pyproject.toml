@@ -65,7 +65,7 @@ version = {attr = "basic_qc_simulator.__version__"}
 target-version = ["py311"]
 
 [tool.pylint]
-disable = "import-error,too-many-branches,import-outside-toplevel,protected-access,too-few-public-methods,fixme"
+disable = "import-error,too-many-branches,import-outside-toplevel,protected-access,too-few-public-methods,fixme,relative-beyond-top-level"
 
 [tool.isort]
 profile = "black"

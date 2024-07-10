@@ -60,8 +60,9 @@ class AbstractSimulator(ABC):
         """
         raise NotImplementedError
 
+    @staticmethod
     @abstractmethod
-    def _apply_gate(self, instruction: Instruction, state: np.ndarray) -> np.ndarray:
+    def _apply_gate(instruction: Instruction, state: np.ndarray) -> np.ndarray:
         """Apply a gate to the state
 
         Args:

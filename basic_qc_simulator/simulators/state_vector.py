@@ -35,7 +35,8 @@ class StateVectorSimulator(AbstractSimulator):
         state_vector = np.reshape(state_vector, (2,) * num_qubits)
         return state_vector
 
-    def _apply_gate(self, instruction: Instruction, state: np.ndarray) -> np.ndarray:
+    @staticmethod
+    def _apply_gate(instruction: Instruction, state: np.ndarray) -> np.ndarray:
         """Apply a gate to the state vector
 
         Args:

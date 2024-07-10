@@ -25,7 +25,7 @@ def generate_random_circuit(num_qubits: int, depth: int, seed: int) -> Circuit:
         # one-qubit gates
         for qubit in range(num_qubits):
             gate_type = rng.choice(
-                ["x", "y", "z", "h", "s", "t", "phase", "rx", "ry", "rz"]
+                ["i", "x", "y", "z", "h", "s", "t", "phase", "rx", "ry", "rz"]
             )
             if gate_type in ["phase", "rx", "ry", "rz"]:
                 circuit.add_gate(
