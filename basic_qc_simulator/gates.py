@@ -13,6 +13,7 @@ class GateTypes(StrEnum):
     Enum class for gate types
     """
 
+    I = "i"
     X = "x"
     Y = "y"
     Z = "z"
@@ -26,6 +27,8 @@ class GateTypes(StrEnum):
     CX = "cx"
     CCX = "ccx"
     SWAP = "swap"
+
+    KRAUS = "kraus"
 
 
 class Gate:
@@ -69,6 +72,17 @@ class Gate:
             int: number of qubits the gate acts on
         """
         return self._num_qubits
+
+
+class IGate(Gate):
+    """
+    Identity gate
+    """
+
+    def __init__(self) -> None:
+        super().__init__(
+            name=GateTypes.I, matrix=np.array([[1, 0], [0, 1]]), num_qubits=1
+        )
 
 
 class XGate(Gate):
@@ -260,6 +274,7 @@ class SwapGate(Gate):
 
 
 GATETYPES_TO_GATE: dict[GateTypes, Any] = {
+    GateTypes.I: IGate,
     GateTypes.X: XGate,
     GateTypes.Y: YGate,
     GateTypes.Z: ZGate,

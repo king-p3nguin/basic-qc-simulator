@@ -4,12 +4,16 @@ Module for the density matrix simulator.
 
 import logging
 from copy import copy
+from typing import TYPE_CHECKING
 
 import numpy as np
 
-from ..circuit import Circuit, Instruction
+from ..circuit import Instruction
 from ..simulator_result import SimulatorResult, SimulatorResultTypes
 from .abstract_simulator import AbstractSimulator
+
+if TYPE_CHECKING:
+    from ..noise.noise_channel import KrausOperators
 
 logger = logging.getLogger(__name__)
 
@@ -19,45 +23,30 @@ class DensityMatrixSimulator(AbstractSimulator):
     Class for the density matrix simulator
     """
 
-    def __init__(self) -> None:
-        super().__init__()
-        self._density_matrix: np.ndarray
-
-    def run(self, circuit: Circuit) -> None:
-        """Run the circuit on the simulator
+    def _prepare_state(self, num_qubits: int) -> np.ndarray:
+        """Prepare the initial density matrix
 
         Args:
-            circuit (Circuit): circuit to run
+            num_qubits (int): number of qubits
+
+        Returns:
+            np.ndarray: initial density matrix
         """
         # Initialize the state vector to |0>^n<0|^n
-        self._density_matrix = np.zeros(
-            (2**circuit.num_qubits, 2**circuit.num_qubits), dtype=complex
-        )
-        self._density_matrix[0, 0] = 1.0
+        density_matrix = np.zeros((2**num_qubits, 2**num_qubits), dtype=complex)
+        density_matrix[0, 0] = 1.0
         # Reshape to (2, 2, ..., 2) tensor
-        self._density_matrix = np.reshape(
-            self._density_matrix, (2,) * circuit.num_qubits * 2
-        )
+        density_matrix = np.reshape(density_matrix, (2,) * num_qubits * 2)
+        return density_matrix
 
-        # Apply the gates in the circuit
-        for index, instruction in enumerate(circuit.instructions):
-            # Save the result if needed
-            if circuit.saving_results.get(index) is not None:
-                self._save_result(circuit.saving_results[index])
-
-            self._apply_gate(instruction)
-
-        # Save the result if needed
-        if circuit.saving_results.get(len(circuit.instructions)) is not None:
-            self._save_result(circuit.saving_results[len(circuit.instructions)])
-
-    def _apply_gate(self, instruction: Instruction) -> None:
+    @staticmethod
+    def _apply_gate(instruction: Instruction, state: np.ndarray) -> np.ndarray:
         """Apply a gate to the density matrix
 
         Args:
             instruction (Instruction): gate instruction
         """
-        circuit_num_qubits = len(self._density_matrix.shape) // 2
+        circuit_num_qubits = len(state.shape) // 2
         gate_num_qubits = instruction.gate.num_qubits
         gate_matrix = instruction.gate.matrix.reshape((2,) * gate_num_qubits * 2)
         gate_matrix_conj = np.conj(instruction.gate.matrix).T.reshape(
@@ -88,8 +77,8 @@ class DensityMatrixSimulator(AbstractSimulator):
             f"output indices: {new_density_matrix_tensor_indices}\n"
         )
         # Apply the gate by contracting the density matrix tensor with the gate tensor
-        self._density_matrix = np.einsum(
-            self._density_matrix,
+        state = np.einsum(
+            state,
             density_matrix_tensor_indices,
             gate_matrix,
             gate_tensor_indices,
@@ -121,15 +110,34 @@ class DensityMatrixSimulator(AbstractSimulator):
         )
         # Apply the conjugate gate by contracting the density matrix tensor
         # with the conjugate gate tensor
-        self._density_matrix = np.einsum(
-            self._density_matrix,
+        state = np.einsum(
+            state,
             density_matrix_tensor_indices,
             gate_matrix_conj,
             gate_tensor_conj_indices,
             new_density_matrix_tensor_indices,
         )
+        return state
 
-    def _save_result(self, save_resut_dict: dict) -> None:
+    def _apply_noise(
+        self, state: np.ndarray, noise: "KrausOperators", qubits: list[int]
+    ) -> np.ndarray:
+        """Apply noise to the density matrix
+
+        Args:
+            state (np.ndarray): density matrix to apply the noise to
+            noise (KrausOperators): noise to apply
+            qubits (list[int]): qubits to apply the noise to
+
+        Returns:
+            np.ndarray: resulting density matrix
+        """
+        num_qubits = len(state.shape) // 2
+        state = np.reshape(state, (2**num_qubits, 2**num_qubits))
+        state = noise.to_superoperator().apply(state, qubits)
+        return state.reshape((2,) * num_qubits * 2)
+
+    def _save_result(self, save_resut_dict: dict, state: np.ndarray) -> None:
         """Save the result of the simulation
 
         Args:
@@ -140,11 +148,11 @@ class DensityMatrixSimulator(AbstractSimulator):
                 "Density matrix simulator does not support saving "
                 f"{save_resut_dict['result_type']} result."
             )
-        circuit_num_qubits = len(self._density_matrix.shape) // 2
+        circuit_num_qubits = len(state.shape) // 2
         self._results.append(
             SimulatorResult(
                 result_type=SimulatorResultTypes.DENSITY_MATRIX,
-                result=self._density_matrix.reshape(
+                result=state.reshape(
                     (2**circuit_num_qubits, 2**circuit_num_qubits)
                 ).copy(),
             )
