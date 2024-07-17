@@ -19,6 +19,7 @@ class SimulatorResultTypes(StrEnum):
     PROBABILITIES = "probabilities"
     AMPLITUDES = "amplitudes"
     DENSITY_MATRIX = "density_matrix"
+    MATRIX_PRODUCT_STATE = "matrix_product_state"
 
 
 @dataclass
