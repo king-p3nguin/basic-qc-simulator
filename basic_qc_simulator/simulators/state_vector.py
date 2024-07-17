@@ -13,6 +13,8 @@ from .abstract_simulator import AbstractSimulator
 
 logger = logging.getLogger(__name__)
 
+# TODO: make StateVector class and add it to quantum_info.states
+
 
 class StateVectorSimulator(AbstractSimulator):
     """

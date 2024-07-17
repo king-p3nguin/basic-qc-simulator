@@ -160,13 +160,16 @@ class MatrixProductStateSimulator(AbstractSimulator):
 
     @staticmethod
     def _state_vector_to_vidal_matrix_product_state(
-        state_vector: np.ndarray, truncate: bool = False
+        state_vector: np.ndarray, truncate: bool = True
     ) -> np.ndarray:
         """Convert a state vector to a Vidal's matrix product state representation
 
         Reference:
         G. Vidal, Efficient Classical Simulation of Slightly Entangled Quantum Computations,
         Phys. Rev. Lett. 91, 147902 (2003).
+
+        U. Schollwöck, The Density-Matrix Renormalization Group in the Age of Matrix Product States,
+        Ann. Phys. 326, 96 (2011).
 
         Args:
             state_vector (np.ndarray): state vector
@@ -200,7 +203,7 @@ class MatrixProductStateSimulator(AbstractSimulator):
                 V_dagger.shape,
             )
             if truncate:
-                S = S[np.nonzero(S)]
+                S = S[np.isclose(S, 0.0) == False]
                 logger.debug(f"Nonzero Singular Values: {S}")
             rank = S.shape[0]
             if col_dim <= row_dim:
@@ -208,9 +211,9 @@ class MatrixProductStateSimulator(AbstractSimulator):
             else:
                 U = U[:, :rank]
                 state_vector = np.diag(S) @ V_dagger
-            gammas.append(U)
+            gammas.append((U[0, :rank], U[1, :rank]))
             lambdas.append(S)
 
-        gammas.append(V_dagger)
+        gammas.append((V_dagger[:rank, 0], V_dagger[:rank, 1]))
 
         return gammas, lambdas

@@ -17,6 +17,8 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger(__name__)
 
+# TODO: make DensityMatrix class and add it to quantum_info.states
+
 
 class DensityMatrixSimulator(AbstractSimulator):
     """

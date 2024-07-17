@@ -13,6 +13,8 @@ from ..simulators.density_matrix import DensityMatrixSimulator
 
 logger = logging.getLogger(__name__)
 
+# TODO: migrate to quantum_info.ops
+
 
 class KrausOperators(list):
     """
