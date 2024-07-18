@@ -49,7 +49,7 @@ class DensityMatrixSimulator(AbstractSimulator):
         return state.apply_gate(instruction.gate, qargs=instruction.qubits)
 
     def _apply_noise(
-        self, state: DensityMatrix, noise: "KrausOperators", qubits: list[int]
+        self, state: DensityMatrix, noise: KrausOperators, qubits: list[int]
     ) -> DensityMatrix:
         """Apply noise to the density matrix
 

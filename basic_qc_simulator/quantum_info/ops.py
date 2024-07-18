@@ -7,7 +7,6 @@ from copy import copy
 
 import numpy as np
 
-from ..circuit import Instruction
 from ..gates import Gate, GateTypes
 from .states.density_matrix import DensityMatrix
 

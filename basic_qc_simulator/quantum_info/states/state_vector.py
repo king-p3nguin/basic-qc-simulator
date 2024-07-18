@@ -35,7 +35,7 @@ class StateVector:
             self.state_vector = state_vector
 
     def __repr__(self) -> str:
-        return f"StateVector(state_vector={self.state_vector.flatten()})"
+        return f"StateVector({self.state_vector.flatten()})"
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, StateVector):

@@ -20,7 +20,7 @@ class DensityMatrix:
     def __init__(self, density_matrix: list | np.ndarray) -> None:
         """
         Args:
-            density_matrix (np.ndarray): density matrix representation of a quantum state
+            density_matrix (list | np.ndarray): density matrix representation of a quantum state
         """
         if not isinstance(density_matrix, np.ndarray):
             density_matrix = np.array(density_matrix)
@@ -38,7 +38,7 @@ class DensityMatrix:
             self.density_matrix = density_matrix
 
     def __repr__(self) -> str:
-        return "DensityMatrix(density_matrix={})".format(
+        return "DensityMatrix({})".format(
             self.density_matrix.reshape(2**self.num_qubits, 2**self.num_qubits)
         )
 
@@ -53,12 +53,20 @@ class DensityMatrix:
     def __add__(self, other: "DensityMatrix") -> "DensityMatrix":
         return DensityMatrix(self.density_matrix + other.density_matrix)
 
-    def __iadd__(self, other: "DensityMatrix") -> "DensityMatrix":
-        return DensityMatrix(self.density_matrix + other.density_matrix)
-
     def apply_gate(
         self, gate: Gate, qargs: int | list[int], inplace: bool = False
     ) -> "DensityMatrix":
+        """
+        Apply a gate to the density matrix.
+
+        Args:
+            gate (Gate): gate to apply
+            qargs (int | list[int]): qubits to apply the gate to
+            inplace (bool): apply the gate in place (default: False)
+
+        Returns:
+            DensityMatrix: resulting density matrix
+        """
         if isinstance(qargs, int):
             qargs = [qargs]
 
