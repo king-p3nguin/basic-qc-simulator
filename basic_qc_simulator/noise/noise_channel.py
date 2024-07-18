@@ -7,7 +7,7 @@ import itertools
 import numpy as np
 
 from ..gates import IGate, XGate, YGate, ZGate
-from .quantum_ops import KrausOperators
+from ..quantum_info.ops import KrausOperators
 
 
 def isotropic_depolarizing_channel(

@@ -10,6 +10,7 @@ import qiskit_aer.noise
 from qiskit.quantum_info.random import random_density_matrix
 
 from basic_qc_simulator.noise import noise_channel
+from basic_qc_simulator.quantum_info.states import DensityMatrix
 
 
 def test_composed_error_channel():
@@ -77,7 +78,7 @@ def test_applying_operators_to_density_matrix(p, qubits, seed):
     num_qubits = len(qubits)
 
     # Create a random 3-qubit density matrix
-    density_matrix = random_density_matrix(2**3, seed=seed).data
+    density_matrix = DensityMatrix(random_density_matrix(2**3, seed=seed).data)
 
     kraus_operators = noise_channel.isotropic_depolarizing_channel(p, num_qubits)
     actual_density_matrix_1 = kraus_operators.apply(density_matrix, qubits)

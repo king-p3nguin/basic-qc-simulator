@@ -32,7 +32,9 @@ class MatrixProductStateSimulator(AbstractSimulator):
         return ([gamma] * num_qubits, [lambda_] * (num_qubits - 1))
 
     @staticmethod
-    def _apply_gate(instruction: Instruction, state: np.ndarray) -> np.ndarray:
+    def _apply_gate(
+        instruction: Instruction, state: np.ndarray
+    ) -> tuple[np.ndarray, np.ndarray]:
         """Apply a gate to the matrix product state
 
         Args:
@@ -52,7 +54,9 @@ class MatrixProductStateSimulator(AbstractSimulator):
             raise ValueError("Only single and two qubit gates are supported")
 
     @staticmethod
-    def _apply_single_qubit_gate(instruction: Instruction, state: np.ndarray) -> None:
+    def _apply_single_qubit_gate(
+        instruction: Instruction, state: np.ndarray
+    ) -> tuple[np.ndarray, np.ndarray]:
         """Apply a single qubit gate to the matrix product state
 
         Args:
@@ -76,7 +80,9 @@ class MatrixProductStateSimulator(AbstractSimulator):
         logger.debug(msg=f"gamma[{qubit}] after application: {gammas[qubit]}")
 
     @staticmethod
-    def _apply_two_qubit_gate(instruction: Instruction, state: np.ndarray) -> None:
+    def _apply_two_qubit_gate(
+        instruction: Instruction, state: np.ndarray
+    ) -> tuple[np.ndarray, np.ndarray]:
         """Apply a two qubit gate to the matrix product state
 
         Args:
@@ -117,7 +123,7 @@ class MatrixProductStateSimulator(AbstractSimulator):
     @staticmethod
     def _state_vector_to_left_canonical_matrix_product_state(
         state_vector: np.ndarray, truncate: bool = False
-    ) -> np.ndarray:
+    ) -> tuple[np.ndarray, np.ndarray]:
         """Convert a state vector to a left-canonical matrix product state representation
 
         Args:
@@ -161,7 +167,7 @@ class MatrixProductStateSimulator(AbstractSimulator):
     @staticmethod
     def _state_vector_to_vidal_matrix_product_state(
         state_vector: np.ndarray, truncate: bool = True
-    ) -> np.ndarray:
+    ) -> tuple[np.ndarray, np.ndarray]:
         """Convert a state vector to a Vidal's matrix product state representation
 
         Reference:

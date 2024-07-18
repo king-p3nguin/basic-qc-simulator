@@ -4,7 +4,7 @@ Module for the base simulator class
 
 import logging
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Any, Optional
 
 import numpy as np
 
@@ -12,8 +12,8 @@ from ..circuit import Circuit, Instruction
 from ..simulator_result import SimulatorResult
 
 if TYPE_CHECKING:
-    from ..noise.noise_channel import KrausOperators
     from ..noise.noise_model import CustomNoiseModel
+    from ..quantum_info.ops import KrausOperators
 
 logger = logging.getLogger(__name__)
 
@@ -68,28 +68,28 @@ class AbstractSimulator(ABC):
             self._save_result(circuit.saving_results[len(circuit.instructions)], state)
 
     @abstractmethod
-    def _prepare_state(self, num_qubits: int) -> np.ndarray:
+    def _prepare_state(self, num_qubits: int) -> Any:
         """Prepare the initial state
 
         Args:
             num_qubits (int): number of qubits
 
         Returns:
-            np.ndarray: initial state
+            Any: initial state
         """
         raise NotImplementedError
 
     @staticmethod
     @abstractmethod
-    def _apply_gate(instruction: Instruction, state: np.ndarray) -> np.ndarray:
+    def _apply_gate(instruction: Instruction, state: Any) -> Any:
         """Apply a gate to the state
 
         Args:
             instruction (Instruction): gate instruction
-            state (np.ndarray): state to apply the gate to
+            state (Any): state to apply the gate to
 
         Returns:
-            np.ndarray: resulting state
+            Any: resulting state
         """
         raise NotImplementedError
 
@@ -111,11 +111,11 @@ class AbstractSimulator(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def _save_result(self, save_resut_dict: dict, state: np.ndarray) -> None:
+    def _save_result(self, save_resut_dict: dict, state: Any) -> None:
         """Save the result of the simulation
 
         Args:
             save_resut_dict (dict): dictionary with the saving result information
-            state (np.ndarray): state to save
+            state (Any): state to save
         """
         raise NotImplementedError
