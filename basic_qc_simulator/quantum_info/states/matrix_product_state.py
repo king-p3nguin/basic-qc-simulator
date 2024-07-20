@@ -3,6 +3,7 @@ Module for matrix product states.
 """
 
 import logging
+from copy import copy
 
 import numpy as np
 
@@ -10,6 +11,8 @@ from ...gates import Gate
 from .state_vector import StateVector
 
 logger = logging.getLogger(__name__)
+
+# TODO: use tensorly, quimb or tenpy for testing
 
 
 class MatrixProductState:
@@ -132,17 +135,20 @@ class MatrixProductState:
         logger.debug(
             "Converting state vector to Vidal's matrix product state representation"
         )
-        rank = 1
+        left_rank = 1
+        right_rank = 1
+        lam_inv = [1.0]
+        d = 2
         for i in range(num_qubits - 1):
             # Reshape the state vector to a matrix
             #     2   2   2   2   2   2
             #  ┌┴─┴─┴─┴─┴─┴┐           ┌───────────┐
             #  │                      │ →  2r  ─┤                      ├─ 2^(n-1)
             #  └───────────┘           └───────────┘
-            col_dim = 2 * rank
-            row_dim = 2 ** (num_qubits - i - 1)
+            col_dim = d * left_rank
+            row_dim = d ** (num_qubits - i - 1)
             state_vector = np.reshape(state_vector, (col_dim, row_dim))
-            U, S, V_dagger = np.linalg.svd(state_vector, full_matrices=True)
+            U, S, V_dagger = np.linalg.svd(state_vector, full_matrices=False)
             logger.debug(
                 "Singular Value Decomposition: U=%s, S=%s, V_dagger=%s",
                 U.shape,
@@ -152,23 +158,23 @@ class MatrixProductState:
             if truncate:
                 S = S[np.isclose(S, 0.0) == False]
                 logger.debug(f"Nonzero Singular Values: {S}")
-            rank = S.shape[0]
-            if col_dim <= row_dim:
-                state_vector = np.diag(S) @ V_dagger[:rank, :]
-            else:
-                U = U[:, :rank]
-                state_vector = np.diag(S) @ V_dagger
-            gammas.append(
-                (np.expand_dims(U[0, :rank], 0), np.expand_dims(U[1, :rank], 0))
-            )
             lambdas.append(S)
+            right_rank = S.size
 
-        gammas.append(
-            (
-                np.expand_dims(V_dagger[:rank, 0], 0),
-                np.expand_dims(V_dagger[:rank, 1], 0),
+            U = U[:, :right_rank]
+            V_dagger = V_dagger[:right_rank, :]
+            state_vector = np.diag(S) @ V_dagger
+
+            gammas.append(
+                np.tensordot(
+                    np.diag(lam_inv), U.reshape(left_rank, d, right_rank), (1, 0)
+                ).transpose(1, 0, 2)
             )
-        )
+            lam_inv = 1.0 / S
+            left_rank = right_rank
+
+        V_dagger = V_dagger.reshape(d, d, 1).transpose(1, 0, 2)
+        gammas.append(V_dagger)
 
         return MatrixProductState(gammas, lambdas)
 
@@ -191,23 +197,36 @@ class MatrixProductState:
             bit_string = bit_string[::-1]
 
         bit_number = int(bit_string[0])
-        amplitude = self.gammas[0][bit_number]
+        amplitude = self.gammas[0][bit_number]  # this is vector
         for idx, bit_number in enumerate(bit_string[1:]):
             bit_number = int(bit_number)
-            amplitude *= self.lambdas[idx] @ self.gammas[idx + 1][bit_number]
+            amplitude = (
+                amplitude
+                @ np.diag(self.lambdas[idx])
+                @ self.gammas[idx + 1][bit_number]
+            )
         return amplitude
 
-    def to_state_vector(self, little_endian: bool = False) -> StateVector:
+    def to_state_vector(self) -> StateVector:
         """Convert the matrix product state to a state vector.
-
-        Args:
-            little_endian (bool): little endian (default: False)
 
         Returns:
             StateVector: state vector
         """
-        sv = []
-        for i in range(2**self.num_qubits):
-            amp = self.get_amplitude(bin(i)[2:].zfill(self.num_qubits), little_endian)
-            sv.append(amp)
-        return StateVector(sv)
+        # sv = []
+        # for i in range(2**self.num_qubits):
+        #     amp = self.get_amplitude(bin(i)[2:].zfill(self.num_qubits))
+        #     sv.append(amp)
+        # return StateVector(sv)
+
+        rank = self.gammas[0].shape[2]
+        d = 2
+        vec = np.reshape(self.gammas[0], (d, rank))
+
+        for i in range(len(self.lambdas)):
+            vec = np.tensordot(
+                np.tensordot(vec, np.diag(self.lambdas[i]), (i + 1, 0)),
+                self.gammas[i + 1],
+                (i + 1, 1),
+            )
+        return StateVector(vec.flatten())

@@ -29,11 +29,13 @@ class DensityMatrix:
             # Reshape to (2, 2, ..., 2) tensor
             self.density_matrix = density_matrix.reshape((2,) * self.num_qubits * 2)
         else:  # folded tensor representation
-            if (
+            if not (
                 density_matrix.shape == (2,) * density_matrix.ndim
                 and density_matrix.ndim % 2 == 0
             ):
-                ValueError("Shape of the density matrix is not (2,) * num_qubits * 2")
+                raise ValueError(
+                    "Shape of the density matrix is not (2,) * num_qubits * 2"
+                )
             self.num_qubits = density_matrix.ndim // 2
             self.density_matrix = density_matrix
 

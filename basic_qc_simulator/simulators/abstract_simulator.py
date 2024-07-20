@@ -96,17 +96,17 @@ class AbstractSimulator(ABC):
     # @staticmethod
     # @abstractmethod
     def _apply_noise(
-        self, state: np.ndarray, noise: "KrausOperators", qubits: list[int]
-    ) -> np.ndarray:
+        self, state: Any, noise: "KrausOperators", qubits: list[int]
+    ) -> Any:
         """Apply noise to the state
 
         Args:
-            state (np.ndarray): state to apply the noise to
+            state (Any): state to apply the noise to
             noise (KrausOperators): noise to apply
             quibits (list[int]): qubits to apply the noise to
 
         Returns:
-            np.ndarray: resulting state
+            Any: resulting state
         """
         raise NotImplementedError
 
