@@ -7,9 +7,8 @@ from copy import copy
 
 import numpy as np
 
-from ..circuit import Instruction
 from ..gates import Gate, GateTypes
-from ..simulators.density_matrix import DensityMatrixSimulator
+from .states.density_matrix import DensityMatrix
 
 logger = logging.getLogger(__name__)
 
@@ -35,36 +34,31 @@ class KrausOperators(list):
         """
         return self._name
 
-    def apply(self, density_matrix: np.ndarray, qubits: int | list[int]) -> np.ndarray:
+    def apply(
+        self, density_matrix: DensityMatrix, qubits: int | list[int]
+    ) -> DensityMatrix:
         """
         Apply the kraus operators to the density matrix
 
         Args:
-            density_matrix (np.ndarray): density matrix to apply the kraus operators to
+            density_matrix (DensityMatrix): density matrix to apply the kraus operators to
             quibits (int | list[int]): qubits to apply the kraus operators to
 
         Returns:
-            np.ndarray: resulting density matrix
+            DensityMatrix: resulting density matrix
         """
         if isinstance(qubits, int):
             qubits = [qubits]
-        if density_matrix.ndim != 2:
-            raise ValueError(
-                f"Density matrix must be 2D, got shape {density_matrix.shape}"
-            )
-        num_qubits = int(np.log2(density_matrix.shape[0]))
+        num_qubits = density_matrix.num_qubits
         kraus_num_qubits = int(np.log2(self[0].shape[0]))
         reshaped_density_matrix = np.reshape(density_matrix, (2,) * num_qubits * 2)
-        new_density_matrix = np.zeros_like(reshaped_density_matrix)
+        new_density_matrix = DensityMatrix(np.zeros_like(reshaped_density_matrix))
         # Apply the kraus operators based on operator-sum representation
         for kraus_operator in self:
             kraus_gate = Gate(GateTypes.KRAUS, kraus_operator, kraus_num_qubits)
-            instruction = Instruction(kraus_gate, qubits)
-            new_density_matrix += DensityMatrixSimulator._apply_gate(
-                instruction, reshaped_density_matrix
-            )
+            new_density_matrix += density_matrix.apply_gate(kraus_gate, qubits)
 
-        return new_density_matrix.reshape((2**num_qubits, 2**num_qubits))
+        return DensityMatrix(new_density_matrix)
 
     def to_superoperator(self) -> "Superoperator":
         """
@@ -135,24 +129,22 @@ class Superoperator:
         """
         return self._name
 
-    def apply(self, density_matrix: np.ndarray, qubits: int | list[int]) -> np.ndarray:
+    def apply(
+        self, density_matrix: DensityMatrix, qubits: int | list[int]
+    ) -> DensityMatrix:
         """
         Apply the superoperator to the density matrix
 
         Args:
-            density_matrix (np.ndarray): density matrix to apply the superoperator to
+            density_matrix (DensityMatrix): density matrix to apply the superoperator to
             quibits (int | list[int]): qubits to apply the superoperator to
 
         Returns:
-            np.ndarray: resulting density matrix
+            DensityMatrix: resulting density matrix
         """
         if isinstance(qubits, int):
             qubits = [qubits]
-        if density_matrix.ndim != 2:
-            raise ValueError(
-                f"Density matrix must be 2D, got shape {density_matrix.shape}"
-            )
-        num_qubits = int(np.log2(density_matrix.shape[0]))
+        num_qubits = density_matrix.num_qubits
         superop_num_qubits = int(np.log2(self._superoperator.shape[0])) // 2
         if len(qubits) != superop_num_qubits:
             raise ValueError(
@@ -165,7 +157,9 @@ class Superoperator:
                 f"number of qubits of superoperator: {num_qubits} < {superop_num_qubits}"
             )
 
-        reshaped_density_matrix = np.reshape(density_matrix, (2,) * num_qubits * 2)
+        reshaped_density_matrix = np.reshape(
+            density_matrix.density_matrix, (2,) * num_qubits * 2
+        )
         reshaped_superoperator = np.reshape(
             self._superoperator, (2,) * superop_num_qubits * 4
         )
@@ -194,4 +188,4 @@ class Superoperator:
             superoperator_indices,
             output_indices,
         )
-        return reshaped_density_matrix.reshape((2**num_qubits, 2**num_qubits))
+        return DensityMatrix(reshaped_density_matrix)

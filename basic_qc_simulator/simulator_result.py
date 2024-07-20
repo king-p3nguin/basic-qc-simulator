@@ -4,8 +4,7 @@ Module for the simulator result class.
 
 from dataclasses import dataclass
 from enum import StrEnum
-
-import numpy as np
+from typing import Any
 
 
 class SimulatorResultTypes(StrEnum):
@@ -19,6 +18,7 @@ class SimulatorResultTypes(StrEnum):
     PROBABILITIES = "probabilities"
     AMPLITUDES = "amplitudes"
     DENSITY_MATRIX = "density_matrix"
+    MATRIX_PRODUCT_STATE = "matrix_product_state"
 
 
 @dataclass
@@ -28,4 +28,4 @@ class SimulatorResult:
     """
 
     result_type: SimulatorResultTypes
-    result: np.ndarray | dict
+    result: Any

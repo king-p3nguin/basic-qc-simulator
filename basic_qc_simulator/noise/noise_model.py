@@ -3,7 +3,7 @@ Module for noise models
 """
 
 from ..gates import GateTypes
-from .quantum_ops import KrausOperators
+from ..quantum_info.ops import KrausOperators
 
 
 class CustomNoiseModel:

@@ -9,6 +9,7 @@ Currently, the following quantum circuit simulators are available:
 
 - State vector simulator
 - Density matrix simulator (+ noise model)
+- Matrix product state simulator
 
 ## Setup
 
